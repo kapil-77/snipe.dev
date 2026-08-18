@@ -1,0 +1,1 @@
+# Envsync — module-scoped hooks

@@ -1,0 +1,72 @@
+# ============================================================
+# snipe.dev — Supabase project configuration
+# Docs: https://supabase.com/docs/reference/cli/config
+# ============================================================
+
+project_id = "snipe-dev"
+
+[api]
+enabled = true
+port = 54321
+schemas = [
+  "public",
+  "graphql_public",
+  "module_onboardtime",
+  "module_prunblocker",
+  "module_envsync",
+]
+schemas_search_path = "public"
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = [
+  "http://localhost:5173/**",
+  "http://127.0.0.1:5173/**",
+]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = false
+enable_confirmations = false
+
+# GitHub OAuth — keys come from the Supabase dashboard:
+#   Dashboard → Authentication → Providers → GitHub
+[auth.external.github]
+enabled = false
+client_id = "env(GITHUB_CLIENT_ID)"
+secret = "env(GITHUB_CLIENT_SECRET)"
+
+[functions]
+enabled = true
+verify_jwt = false
+
+[edge_runtime]
+enabled = true
+policy = "oneshot"
+
+[analytics]
+enabled = true
+
+[realtime]
+enabled = true

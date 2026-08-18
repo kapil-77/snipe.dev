@@ -1,0 +1,1 @@
+# Onboardtime — module-scoped hooks (server state, feature flags, etc.)
