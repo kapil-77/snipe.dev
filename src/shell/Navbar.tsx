@@ -1,6 +1,6 @@
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@/app/auth';
 import { Button, buttonClasses } from '@/components/ui/Button';
@@ -19,7 +19,14 @@ const NAV_LINKS = [
  */
 export function Navbar() {
   const [open, setOpen] = useState(false);
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleSignOut() {
+    setOpen(false);
+    await signOut();
+    navigate('/login', { replace: true });
+  }
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-line/40 bg-base/80 backdrop-blur-md">
@@ -40,9 +47,24 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           {session?.user ? (
-            <Link to="/app/modules" className={buttonClasses('outline', 'sm')}>
-              Open workspace
-            </Link>
+            <div className="hidden items-center gap-2 sm:flex">
+              <span
+                className="max-w-[160px] truncate text-xs text-faint"
+                title={session.user.email ?? ''}
+              >
+                {session.user.email}
+              </span>
+              <Link to="/app/modules" className={buttonClasses('outline', 'sm')}>
+                Workspace
+              </Link>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className={buttonClasses('ghost', 'sm')}
+              >
+                Sign out
+              </button>
+            </div>
           ) : (
             <>
               <Link
@@ -87,13 +109,21 @@ export function Navbar() {
             ))}
           </div>
           {session?.user ? (
-            <Link
-              to="/app/modules"
-              onClick={() => setOpen(false)}
-              className="mt-3 w-full"
-            >
-              <Button variant="primary" className="w-full">Open workspace</Button>
-            </Link>
+            <div className="mt-4 flex flex-col gap-2 border-t border-dashed border-line/40 pt-4">
+              <span className="truncate text-xs text-faint">
+                {session.user.email}
+              </span>
+              <Link
+                to="/app/modules"
+                onClick={() => setOpen(false)}
+                className="w-full"
+              >
+                <Button variant="primary" className="w-full">Open workspace</Button>
+              </Link>
+              <Button variant="ghost" className="w-full" onClick={handleSignOut}>
+                Sign out
+              </Button>
+            </div>
           ) : (
             <div className="mt-3 flex gap-2">
               <Link to="/login" className="flex-1" onClick={() => setOpen(false)}>

@@ -35,27 +35,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     let mounted = true;
+    let settleTimer: number | undefined;
+
+    const settle = () => {
+      if (mounted) setLoading(false);
+    };
+
+    // Subscribe BEFORE the initial session is resolved. `detectSessionInUrl`
+    // processes the OAuth fragment (`#access_token=…`) synchronously during
+    // this call and broadcasts `INITIAL_SESSION`/`SIGNED_IN` — if we
+    // subscribed after `getSession()`, that event is missed and the auth
+    // callback page would hang until a manual refresh.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (!mounted) return;
+      setSession(nextSession);
+      if (
+        event === 'INITIAL_SESSION' ||
+        event === 'SIGNED_IN' ||
+        event === 'SIGNED_OUT' ||
+        event === 'TOKEN_REFRESHED'
+      ) {
+        settle();
+      }
+    });
+
+    // Belt-and-suspenders: resolve the stored/staged session, and guarantee
+    // loading settles even if no auth event ever fires.
+    settleTimer = window.setTimeout(settle, 4000);
 
     supabase.auth
       .getSession()
       .then(({ data }) => {
         if (mounted) {
           setSession(data.session);
-          setLoading(false);
+          settle();
         }
       })
       .catch(() => {
-        if (mounted) setLoading(false);
+        if (mounted) settle();
       });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      if (mounted) setSession(nextSession);
-    });
 
     return () => {
       mounted = false;
+      clearTimeout(settleTimer);
       subscription.unsubscribe();
     };
   }, []);

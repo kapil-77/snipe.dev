@@ -12,11 +12,20 @@ export function PublicLayout() {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    if (hash) {
-      const el = document.querySelector(hash);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-        return;
+    // Only well-formed "section" hashes are scroll targets (e.g. #modules,
+    // #pricing, #faq). OAuth callbacks arrive as `#access_token=…&refresh_token=…`,
+    // which is NOT a valid CSS selector — and `document.querySelector()` throws on
+    // it, blanking the whole app before supabase-js can finish its handshake.
+    const isSectionHash = /^#[A-Za-z_][A-Za-z0-9_-]*$/.test(hash);
+    if (isSectionHash) {
+      try {
+        const el = document.querySelector(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      } catch {
+        // Malformed selector — fall through to scroll-to-top.
       }
     }
     window.scrollTo({ top: 0 });
