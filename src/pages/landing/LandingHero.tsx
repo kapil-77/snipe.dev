@@ -35,9 +35,9 @@ export function LandingHero() {
 
           <Reveal delay={180}>
             <p className="mx-auto mt-6 max-w-2xl text-balance text-center text-base leading-relaxed text-muted sm:text-lg">
-              Onboard engineers, gate pull requests, sync environments. Each tool owns its
-              schema, edge functions and RLS boundary — one login, zero cross-contamination,
-              additive by design.
+              Snipe.dev brings developer onboarding, PR controls, and environment sync into one secure platform.
+              <br />
+              One login, zero cross-contamination, additive by design.
             </p>
           </Reveal>
 

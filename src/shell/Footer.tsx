@@ -84,7 +84,7 @@ export function Footer() {
         <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-line/40 pt-5 sm:flex-row sm:items-center">
           <p className="text-xs text-faint">© {year} {SITE_NAME}. All rights reserved.</p>
           <a
-            href="https://github.com/snipe-dev"
+            href="https://github.com/kapil-77/snipe.dev"
             target="_blank"
             rel="noreferrer"
             aria-label="snipe.dev on GitHub"
