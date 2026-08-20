@@ -9,6 +9,19 @@
 
 create extension if not exists pgcrypto;
 
+-- ----------------------------------------------------------------
+-- Default privileges — every FUTURE table in the public schema is
+-- automatically GRANTed to the API roles at creation, so new shared
+-- tables (waitlist, profiles, etc.) never fail with
+-- "permission denied for table ..." the way manually-created ones did.
+-- ----------------------------------------------------------------
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to anon, authenticated, service_role;
+alter default privileges in schema public
+  grant all on sequences to anon, authenticated, service_role;
+alter default privileges in schema public
+  grant all on routines to anon, authenticated, service_role;
+
 -- ------------------------------------------------------------------
 -- public.users — 1:1 profile for auth.users (kept in sync via trigger)
 -- ------------------------------------------------------------------

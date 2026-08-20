@@ -3,7 +3,8 @@
 # Deploy every snipe.dev edge function and list their status.
 #
 # Usage:
-#   ./scripts/deploy.sh              # deploy all three, then list
+#   ./scripts/deploy.sh              # deploy functions + push migrations, then list
+#   ./scripts/deploy.sh --db-only    # apply pending migrations (grants) only, then list
 #   ./scripts/deploy.sh --verify     # list-only status check
 #
 # Requires the Supabase CLI + `supabase login` (or SUPABASE_ACCESS_TOKEN).
@@ -12,9 +13,17 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-FUNCTIONS=(onboardtime-hello prunblocker-hello envsync-hello)
+FUNCTIONS=(
+  onboardtime-hello
+  onboardtime-bootstrap
+  onboardtime-runbooks
+  onboardtime-items
+  prunblocker-hello
+  envsync-hello
+)
 
-if [[ "${1:-}" == "--verify" || "${1:-}" == "-v" ]]; then
+MODE="${1:-}"
+if [[ "$MODE" == "--verify" || "$MODE" == "-v" ]]; then
   echo "── deployed functions ───────────────────────────────"
   supabase functions list
   exit 0
@@ -24,12 +33,17 @@ echo "── snipe.dev | supabase CLI ──────────────
 supabase --version
 echo ""
 
-echo "── deploying edge functions ───────────────────────────"
-for fn in "${FUNCTIONS[@]}"; do
-  echo "  → ${fn}"
-  supabase functions deploy "${fn}"
-  echo ""
-done
+if [[ "$MODE" != "--db-only" ]]; then
+  echo "── deploying edge functions ───────────────────────────"
+  for fn in "${FUNCTIONS[@]}"; do
+    echo "  → ${fn}"
+    supabase functions deploy "${fn}"
+    echo ""
+  done
+fi
+
+echo "── applying migrations / grants ──────────────────────"
+supabase db push
 
 echo "── deployed functions ────────────────────────────────"
 supabase functions list
