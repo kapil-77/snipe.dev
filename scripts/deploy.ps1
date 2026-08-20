@@ -1,23 +1,29 @@
 <#
 .DESCRIPTION
-Deploys every snipe.dev edge function to Supabase and lists their status.
+Deploys snipe.dev edge functions, pushes pending migrations, then lists status.
 
 Run from anywhere; it detects the project root from its own location.
 Requires the Supabase CLI + a valid profile (`supabase login`) or
 `SUPABASE_ACCESS_TOKEN` in the environment.
 
 Examples:
-  .\scripts\deploy.ps1               # deploy all functions, then list
-  .\scripts\deploy.ps1 -OnlyVerify   # skip deploy; just list status
+  .\scripts\deploy.ps1               # deploy functions + push migrations, then list
+  .\scripts\deploy.ps1 -OnlyVerify   # list-only status check
+  .\scripts\deploy.ps1 -DBOnly       # apply pending migrations (grants) only, then list
 #>
 param(
-  [switch]$OnlyVerify
+  [switch]$OnlyVerify,
+  [switch]$DBOnly
 )
 
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)
 
-$Functions = @('onboardtime-hello', 'prunblocker-hello', 'envsync-hello')
+$Functions = @(
+    'onboardtime-hello', 'onboardtime-bootstrap',
+    'onboardtime-runbooks', 'onboardtime-items',
+    'prunblocker-hello', 'envsync-hello'
+  )
 
 function Invoke-Supabase {
   param([string[]]$Arguments)
@@ -34,7 +40,7 @@ function Invoke-Supabase {
 Write-Host "---- snipe.dev | supabase CLI ----" -ForegroundColor DarkCyan
 Invoke-Supabase -Arguments @('--version')
 
-if (-not $OnlyVerify) {
+if (-not $OnlyVerify -and -not $DBOnly) {
   Write-Host ""
   Write-Host "---- deploying edge functions ----" -ForegroundColor DarkCyan
   foreach ($fn in $Functions) {
@@ -44,5 +50,10 @@ if (-not $OnlyVerify) {
   }
 }
 
+Write-Host ""
+Write-Host "---- applying migrations / grants ----" -ForegroundColor DarkCyan
+Invoke-Supabase -Arguments @('db', 'push')
+
+Write-Host ""
 Write-Host "---- deployed functions ----" -ForegroundColor DarkCyan
 Invoke-Supabase -Arguments @('functions', 'list')

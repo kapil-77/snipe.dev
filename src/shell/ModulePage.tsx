@@ -19,7 +19,12 @@ export const MODULE_TABLES: Record<string, string[]> = {
 
 /** Stub edge functions scaffolded per module. */
 export const MODULE_FUNCTIONS: Record<string, string[]> = {
-  onboardtime: ['onboardtime-hello'],
+  onboardtime: [
+    'onboardtime-hello',
+    'onboardtime-bootstrap',
+    'onboardtime-runbooks',
+    'onboardtime-items',
+  ],
   prunblocker: ['prunblocker-hello'],
   envsync: ['envsync-hello'],
 };

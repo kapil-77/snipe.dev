@@ -37,7 +37,7 @@ export const MODULES: ModuleDef[] = [
     tagline: 'Onboarding checklists & runbooks',
     description:
       'Per-role checklists with owners, due milestones and progress tracking, so new team members ship their first task faster.',
-    status: 'coming-soon',
+    status: 'live',
     schema: 'module_onboardtime',
     edgePrefix: 'onboardtime-',
     order: 0,
