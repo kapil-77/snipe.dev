@@ -4,8 +4,7 @@
 
 ### **Dev tools that ship as sealed modules.**
 
-Onboard engineers, control pull requests, and keep environments aligned —
-with one login and isolated boundaries by design.
+Onboard engineers, control pull requests, and keep environments in sync with one login and isolated boundaries by design.
 
 <br />
 
@@ -83,12 +82,12 @@ That makes new tools additive instead of invasive.
 ## ◉ Interface
 
 <p align="center">
-  <img src="image.png" alt="snipe.dev landing page" width="900" />
+  <img height="1032" alt="snipe landing page" src="https://github.com/user-attachments/assets/7be50d06-7100-47d9-95bc-f18d3c158bec"/>
 </p>
 
 
 <p align="center">
-  <img src="image-1.png" alt="snipe.dev modules page" width="900" />
+  <img height="1028" alt="modules" src="https://github.com/user-attachments/assets/880e32a2-341a-465c-92be-4213fa4a0f04" />
 </p>
 
 ---
