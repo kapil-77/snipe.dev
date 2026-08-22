@@ -10,15 +10,29 @@ import { Reveal } from '@/components/ui/Reveal';
 import { createItem, deleteItem, updateItem } from '../api';
 import { useRunbookDetail } from '../hooks/useRunbookDetail';
 import { useWorkspaceOrg } from '../hooks/useWorkspaceOrg';
-import { ITEM_STATUSES } from '../types';
+import { SECTION_LABELS } from '../types';
 import type { ChecklistItem } from '../types';
+import { AnalyticsBar } from './AnalyticsBar';
 import { ItemRow } from './ItemRow';
+import { NextMilestone } from './NextMilestone';
+import { SectionHeader } from './SectionHeader';
 
-/** Checklist detail — items with status cycle, ordering and deletion. */
+/** Checklist detail — sectioned items, status/order, milestone + analytics. */
 export function ChecklistDetail() {
   const { checklistId } = useParams<{ checklistId: string }>();
   const { org, loading: orgLoading, error: orgError, refresh: refreshOrg } = useWorkspaceOrg();
-  const { runbook, items, loading, error, refresh } = useRunbookDetail(
+  const {
+    runbook,
+    items,
+    analytics,
+    loading,
+    error,
+    refresh,
+    swapLocal,
+    applyItemLocally,
+    removeItemLocally,
+    refreshAnalyticsOnly,
+  } = useRunbookDetail(
     org?.orgId,
     checklistId,
   );
@@ -27,16 +41,27 @@ export function ChecklistDetail() {
   const [saving, setSaving] = useState(false);
   const [mutationError, setMutationError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
   const doneCount = items.filter((i) => i.status === 'done').length;
   const pct = items.length > 0 ? Math.round((doneCount / items.length) * 100) : 0;
 
-  async function run<T>(fn: () => Promise<T>) {
+  function toggleSection(section: string) {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(section)) next.delete(section);
+      else next.add(section);
+      return next;
+    });
+  }
+
+  async function run<T>(fn: () => Promise<T>): Promise<T | null> {
     setMutationError(null);
     try {
-      await fn();
+      return await fn();
     } catch (e) {
       setMutationError(e instanceof Error ? e.message : String(e));
+      return null;
     }
   }
 
@@ -44,21 +69,31 @@ export function ChecklistDetail() {
     e.preventDefault();
     if (!org || !checklistId || !draft.trim()) return;
     setSaving(true);
-    await run(async () => {
-      await createItem(org.orgId, checklistId, { title: draft.trim() });
-      setDraft('');
-      await refresh();
+    const created = await run(async () => {
+      return await createItem(org.orgId, checklistId, { title: draft.trim() });
     });
+    if (created) {
+      setDraft('');
+      applyItemLocally(created);
+      void refreshAnalyticsOnly();
+    }
     setSaving(false);
   }
 
   async function cycle(item: ChecklistItem) {
-    const next = ITEM_STATUSES[(ITEM_STATUSES.indexOf(item.status) + 1) % ITEM_STATUSES.length];
+    // Direct complete-toggle: click ticks the box (todo → done, doing → done),
+    // second click un-checks (done → todo). Applied OPTIMISTICALLY: the PATCH
+    // returns the fresh row, which replaces the entry in React state — no full
+    // list reload, so the row never refades / refetches.
+    const next: ChecklistItem['status'] = item.status === 'done' ? 'todo' : 'done';
     setBusyId(item.id);
-    await run(async () => {
-      await updateItem(item.id, { status: next });
-      await refresh();
+    const updated = await run(async () => {
+      return await updateItem(item.id, { status: next });
     });
+    if (updated) {
+      applyItemLocally(updated);
+      void refreshAnalyticsOnly();
+    }
     setBusyId(null);
   }
 
@@ -72,19 +107,46 @@ export function ChecklistDetail() {
         updateItem(item.id, { sort_order: neighbor.sort_order }),
         updateItem(neighbor.id, { sort_order: item.sort_order }),
       ]);
-      await refresh();
+      // Swap in place so ordering updates without a full list reload.
+      swapLocal(index, target);
     });
     setBusyId(null);
   }
 
   async function remove(item: ChecklistItem) {
     setBusyId(item.id);
-    await run(async () => {
+    const ok = await run(async () => {
       await deleteItem(item.id);
-      await refresh();
+      return true;
     });
+    if (ok) {
+      removeItemLocally(item.id);
+      void refreshAnalyticsOnly();
+    }
     setBusyId(null);
   }
+
+  // Group items by section: known onboarding sections first (in order),
+  // then any extra sections, each preserving item sort_order.
+  const SECTION_ORDER: string[] = [
+    'access',
+    'dev-setup',
+    'codebase',
+    'team',
+    'contribution',
+    'general',
+  ];
+  const groups = new Map<string, ChecklistItem[]>();
+  for (const item of items) {
+    const key = item.section ?? 'general';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(item);
+  }
+  const groupedSections = Array.from(groups.keys()).sort((a, b) => {
+    const ia = SECTION_ORDER.indexOf(a);
+    const ib = SECTION_ORDER.indexOf(b);
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
 
   if (orgLoading) {
     return (
@@ -211,20 +273,48 @@ export function ChecklistDetail() {
           </Frame>
         </Reveal>
       ) : (
-        <div className="mt-8 flex flex-col gap-3">
-          {items.map((item, index) => (
-            <Reveal key={item.id} delay={Math.min(index, 4) * 40}>
-              <ItemRow
-                item={item}
-                index={index}
-                total={items.length}
-                busy={busyId === item.id}
-                onCycle={() => cycle(item)}
-                onMove={(dir) => move(item, index, dir)}
-                onDelete={() => remove(item)}
-              />
-            </Reveal>
-          ))}
+        <div className="mt-8 flex flex-col gap-6">
+          {runbook?.next_milestone && (
+            <NextMilestone title={runbook.next_milestone} dueOn={runbook.next_milestone_due} />
+          )}
+
+          <AnalyticsBar data={analytics} />
+
+          {groupedSections.map((section) => {
+            const sectionItems = groups.get(section)!;
+            const sectionDone = sectionItems.filter((i) => i.status === 'done').length;
+            const isOpen = !collapsed.has(section);
+            return (
+              <section key={section} className="flex flex-col gap-2">
+                {groupedSections.length > 1 && (
+                  <SectionHeader
+                    title={SECTION_LABELS[section as keyof typeof SECTION_LABELS] ?? section}
+                    count={sectionItems.length}
+                    done={sectionDone}
+                    open={isOpen}
+                    onToggle={() => toggleSection(section)}
+                  />
+                )}
+                {isOpen && (
+                  <div className="flex flex-col gap-2">
+                    {sectionItems.map((item, index) => (
+                      <Reveal key={item.id} delay={Math.min(index, 4) * 40}>
+                        <ItemRow
+                          item={item}
+                          index={index}
+                          total={sectionItems.length}
+                          busy={busyId === item.id}
+                          onCycle={() => cycle(item)}
+                          onMove={(dir) => move(item, index, dir)}
+                          onDelete={() => remove(item)}
+                        />
+                      </Reveal>
+                    ))}
+                  </div>
+                )}
+              </section>
+            );
+          })}
         </div>
       )}
     </div>

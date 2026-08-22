@@ -1,20 +1,26 @@
 import { ListChecks, LoaderCircle, Plus, Route as RouteIcon } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Frame } from '@/components/ui/Frame';
 import { Input } from '@/components/ui/Input';
 import { Reveal } from '@/components/ui/Reveal';
-import { createRunbook, deleteRunbook } from '../api';
+import type { TemplateRole } from '@/lib/database.types';
+import { createRunbook, createRunbookFromTemplate, deleteRunbook } from '../api';
 import { useRunbooks } from '../hooks/useRunbooks';
+import { useTemplates } from '../hooks/useTemplates';
 import { useWorkspaceOrg } from '../hooks/useWorkspaceOrg';
 import { RunbookCard } from './RunbookCard';
+import { RunbookTemplates } from './RunbookTemplates';
 
-/** Onboardtime home — runbook grid + create form. */
+/** Onboardtime home — runbook grid + template picker + create form. */
 export function OnboardtimeHome() {
   const { org, loading: orgLoading, error: orgError, refresh: refreshOrg } = useWorkspaceOrg();
   const { runbooks, loading, error, refresh } = useRunbooks(org?.orgId);
+  const templates = useTemplates();
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -39,6 +45,12 @@ export function OnboardtimeHome() {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function createFromTemplate(role: TemplateRole) {
+    if (!org) return;
+    const created = await createRunbookFromTemplate(org.orgId, role);
+    navigate(`/app/modules/onboardtime/${created.id}`);
   }
 
   async function remove(id: string) {
@@ -139,6 +151,12 @@ export function OnboardtimeHome() {
           </form>
         </Frame>
       </Reveal>
+
+      {templates.length > 0 && (
+        <Reveal className="mt-8">
+          <RunbookTemplates templates={templates} onCreate={createFromTemplate} />
+        </Reveal>
+      )}
 
       {loading ? (
         <div className="flex min-h-[24vh] items-center justify-center">
