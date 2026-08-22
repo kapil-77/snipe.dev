@@ -227,3 +227,42 @@ RunbookCard,RunbookTemplates,AnalyticsBar,SectionHeader,NextMilestone,ItemMeta}`
 - **Not yet deployed to hosted Supabase.** To stage: `supabase functions deploy
   onboardtime-runbooks onboardtime-items` + `supabase db push`; then `deploy.sh --verify`
   (expect 6).
+
+---
+
+## Production deploy checklist (Vercel + Supabase hosted)
+
+### Vercel (live: https://snipedev.vercel.app)
+- Env vars (dashboard → your project → Settings → Environment Variables):
+  | Var | Value |
+  |---|---|
+  | `VITE_SUPABASE_URL` | `https://savvsjckbgtccqvgmooo.supabase.co` |
+  | `VITE_SUPABASE_ANON_KEY` | the anon (public) key |
+  | `VITE_SUPABASE_FUNCTIONS_URL` | optional; client auto-derives `/functions/v1` |
+  Redeploy after adding/changing env vars (Vercel builds are env-snapshotted).
+- **`vercel.json` (root)** provides the SPA fallback so OAuth callbacks + deep links work:
+  ```json
+  { "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
+  ```
+  Vercel serves real files (assets) before applying the rewrite — safe for a BrowserRouter SPA.
+- Without it, any non-home path gives a filesystem **404** (e.g. `/auth/callback#access_token=…`).
+
+### Supabase hosted (via Dashboard)
+- **Authentication → URL Configuration**:
+  - **Site URL** = `https://snipedev.vercel.app` (or a custom domain).
+  - **Redirect URLs** include `https://snipedev.vercel.app/**` AND `http://localhost:5173/**` (local dev).
+- **Authentication → Providers → GitHub**:
+  - Client ID + secret from the GitHub OAuth app; callback `https://savvsjckbgtccqvgmooo.supabase.co/auth/v1/callback`.
+- **Edge-function secrets**: set `SERVICE_ROLE_KEY` (JWT from Dashboard → Settings → API) on `onboardtime-bootstrap` — required for personal-org provisioning.
+- Apply pending migrations + deploy edge functions once from the CLI:
+  `supabase db push && supabase functions deploy onboardtime-runbooks onboardtime-items` (then `deploy.sh --verify`, expect 6).
+
+### Login/OAuth flow (post-fix)
+1. `/login` → GitHub → Supabase → redirect to `https://snipedev.vercel.app/auth/callback#access_token=…`
+2. `vercel.json` rewrite serves `index.html` → `AuthCallback` runs →
+   `detectSessionInUrl` exchanges the fragment → forwards `/app/modules`.
+
+### ⚠️ Token hygiene
+`#access_token=…&refresh_token=…&provider_token=gho_/ghr_…` are LIVE credentials shown in
+the URL bar. Revoke any leaked sessions via Supabase Dashboard (Authentication → Users →
+Revoke sessions) and GitHub (Settings → Applications → Revoke the OAuth grant).
