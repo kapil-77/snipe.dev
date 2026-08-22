@@ -52,11 +52,36 @@ export type WaitlistRow = {
   created_at: string | null;
 }
 
+export type ItemPriority = 'low' | 'medium' | 'high';
+
+export type ItemSection =
+  | 'access'
+  | 'dev-setup'
+  | 'codebase'
+  | 'team'
+  | 'contribution'
+  | 'general';
+
+export type TemplateRole =
+  | 'core'
+  | 'frontend'
+  | 'backend'
+  | 'qa'
+  | 'designer'
+  | 'product'
+  | 'custom';
+
 export type ChecklistTemplateRow = {
   id: string;
   org_id: string;
   title: string;
   description: string | null;
+  is_template: boolean;
+  role: TemplateRole | null;
+  owner_id: string | null;
+  next_milestone: string | null;
+  next_milestone_due: string | null;
+  completed_at: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -69,6 +94,11 @@ export type ChecklistItemRow = {
   user_id: string | null;
   title: string;
   status: 'todo' | 'doing' | 'done';
+  section: ItemSection;
+  category: string | null;
+  priority: ItemPriority;
+  blocked: boolean;
+  owner_id: string | null;
   due_on: string | null;
   sort_order: number;
   created_by: string | null;

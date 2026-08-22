@@ -8,8 +8,8 @@ import { corsHeaders, isCors, json } from "../_shared/cors.ts";
  * CRUD for module_onboardtime.checklist_items.
  *
  *   GET    /items?org_id=...&checklist_id=...   → items ordered by sort_order
- *   POST   /items {org_id,checklist_id,title}   → appends (max sort_order + 1)
- *   PATCH  /items {id,title?,status?,sort_order?}
+ *   POST   /items {org_id,checklist_id,title,section?,category?,priority?,due_on?} → appends
+ *   PATCH  /items {id,title?,status?,sort_order?,section?,category?,priority?,blocked?,due_on?,owner_id?}
  *   DELETE /items?id=...
  *
  * The caller's Authorization header is passed through to PostgREST, so RLS
@@ -17,6 +17,7 @@ import { corsHeaders, isCors, json } from "../_shared/cors.ts";
  */
 
 const STATUSES = new Set(["todo", "doing", "done"]);
+const PRIORITIES = new Set(["low", "medium", "high"]);
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_ANON = Deno.env.get("SUPABASE_ANON_KEY");
@@ -86,6 +87,12 @@ Deno.serve(async (req) => {
           title,
           status: "todo",
           sort_order,
+          section: body.section ? String(body.section) : "general",
+          category: body.category ? String(body.category) : null,
+          priority: body.priority ? String(body.priority) : "medium",
+          blocked: Boolean(body.blocked),
+          due_on: body.due_on ? String(body.due_on) : null,
+          owner_id: body.owner_id ? String(body.owner_id) : null,
         })
         .select("*")
         .single();
@@ -107,6 +114,20 @@ Deno.serve(async (req) => {
           return json({ error: `status must be one of: ${[...STATUSES].join(", ")}` }, { status: 400 });
         }
         patch.status = status;
+      }
+      if (body.section !== undefined) patch.section = body.section == null ? "general" : String(body.section);
+      if (body.category !== undefined) patch.category = body.category == null ? null : String(body.category);
+      if (body.priority !== undefined) {
+        const priority = String(body.priority);
+        if (!PRIORITIES.has(priority)) {
+          return json({ error: `priority must be one of: ${[...PRIORITIES].join(", ")}` }, { status: 400 });
+        }
+        patch.priority = priority;
+      }
+      if (body.blocked !== undefined) patch.blocked = Boolean(body.blocked);
+      if (body.due_on !== undefined) patch.due_on = body.due_on == null ? null : String(body.due_on);
+      if (body.owner_id !== undefined) {
+        patch.owner_id = body.owner_id === null || body.owner_id === "" ? null : String(body.owner_id);
       }
 
       const { data, error } = await items()

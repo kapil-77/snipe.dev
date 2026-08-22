@@ -6,9 +6,13 @@ import type {
   ItemDraft,
   ItemStatus,
   Runbook,
+  RunbookAnalytics,
   RunbookDraft,
   WorkspaceOrg,
 } from './types';
+import { ROLE_LABELS } from './types';
+import { templateItemsForRole } from './templates';
+import type { TemplateRole } from '@/lib/database.types';
 
 /*
  * API surface for the Onboardtime module.
@@ -100,6 +104,60 @@ export async function deleteRunbook(id: string): Promise<void> {
   });
 }
 
+export interface RunbookPatch {
+  title?: string;
+  description?: string | null;
+  role?: string | null;
+  owner_id?: string | null;
+  next_milestone?: string | null;
+  next_milestone_due?: string | null;
+}
+
+export async function updateRunbook(id: string, patch: RunbookPatch): Promise<Runbook> {
+  return invoke<Runbook>('onboardtime-runbooks', {
+    method: 'PATCH',
+    body: { id, ...patch },
+  });
+}
+
+/** Clone a role template (is_template=true) into an active runbook. */
+export async function cloneTemplate(
+  orgId: string,
+  templateId: string,
+): Promise<Runbook> {
+  return invoke<Runbook>('onboardtime-runbooks', {
+    method: 'POST',
+    body: { org_id: orgId, template_id: templateId },
+  });
+}
+
+/**
+ * Create a runbook from a TS-only role preset (templates.ts): creates the
+ * checklist with the role, then bulk-inserts the preset's starter items.
+ */
+export async function createRunbookFromTemplate(
+  orgId: string,
+  role: TemplateRole,
+): Promise<Runbook> {
+  const runbook = await createRunbook(orgId, {
+    title: `${ROLE_LABELS[role]} onboarding`,
+    role,
+  });
+  const items = templateItemsForRole(role);
+  for (const item of items) {
+    await createItem(orgId, runbook.id, item);
+  }
+  return runbook;
+}
+
+/** Org-wide team analytics (active onboardings, avg completion, blockers). */
+export async function getTeamAnalytics(orgId: string): Promise<RunbookAnalytics> {
+  return invoke<RunbookAnalytics>('onboardtime-runbooks', {
+    method: 'GET',
+    query: { org_id: orgId, analytics: 'true' },
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /*  checklist items                                                    */
 /* ------------------------------------------------------------------ */
@@ -129,6 +187,12 @@ export interface ItemPatch {
   title?: string;
   status?: ItemStatus;
   sort_order?: number;
+  section?: ChecklistItem['section'];
+  category?: string | null;
+  priority?: ChecklistItem['priority'];
+  blocked?: boolean;
+  due_on?: string | null;
+  owner_id?: string | null;
 }
 
 export async function updateItem(id: string, patch: ItemPatch): Promise<ChecklistItem> {
