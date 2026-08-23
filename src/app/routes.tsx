@@ -10,6 +10,7 @@ import { ModulePage } from '@/shell/ModulePage';
 import { PublicLayout } from '@/shell/PublicLayout';
 import { WorkspaceLayout } from '@/shell/WorkspaceLayout';
 import { onboardtimeRoutes } from '@/modules/onboardtime/routes';
+import { prunblockerRoutes } from '@/modules/prunblocker/routes';
 
 /**
  * Module routes. Each sealed module registers its own subtree here once it
@@ -37,6 +38,9 @@ export function AppRoutes() {
         <Route path="modules" element={<DashboardPage />} />
         {/* Live modules register static routes here (ranked above :slug). */}
         {onboardtimeRoutes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.element} />
+        ))}
+        {prunblockerRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={route.element} />
         ))}
         <Route path="modules/:slug" element={<ModulePage />} />

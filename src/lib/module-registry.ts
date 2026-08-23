@@ -77,3 +77,25 @@ export function getModule(slug: string | undefined): ModuleDef | undefined {
 export function getLiveModules(): ModuleDef[] {
   return MODULES.filter((m) => m.status === 'live');
 }
+
+/**
+ * Scaffolded table inventory per module (mirrors supabase/migrations/*.sql).
+ * Shared by the module blueprint screens — single source of truth.
+ */
+export const MODULE_TABLES: Record<string, string[]> = {
+  onboardtime: ['checklists', 'checklist_items'],
+  prunblocker: ['merge_gates'],
+  envsync: ['environment_vars'],
+};
+
+/** Stub edge functions scaffolded per module. */
+export const MODULE_FUNCTIONS: Record<string, string[]> = {
+  onboardtime: [
+    'onboardtime-hello',
+    'onboardtime-bootstrap',
+    'onboardtime-runbooks',
+    'onboardtime-items',
+  ],
+  prunblocker: ['prunblocker-hello'],
+  envsync: ['envsync-hello'],
+};

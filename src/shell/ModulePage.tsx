@@ -8,26 +8,7 @@ import { Frame } from '@/components/ui/Frame';
 import { Reveal } from '@/components/ui/Reveal';
 import { WaitlistForm } from '@/components/ui/WaitlistForm';
 import { probeEdgeFunction, type ProbeResult } from '@/lib/api';
-import { getModule } from '@/lib/module-registry';
-
-/** Scaffolded table inventory per module (mirrors supabase/migrations/*.sql). */
-export const MODULE_TABLES: Record<string, string[]> = {
-  onboardtime: ['checklists', 'checklist_items'],
-  prunblocker: ['merge_gates'],
-  envsync: ['environment_vars'],
-};
-
-/** Stub edge functions scaffolded per module. */
-export const MODULE_FUNCTIONS: Record<string, string[]> = {
-  onboardtime: [
-    'onboardtime-hello',
-    'onboardtime-bootstrap',
-    'onboardtime-runbooks',
-    'onboardtime-items',
-  ],
-  prunblocker: ['prunblocker-hello'],
-  envsync: ['envsync-hello'],
-};
+import { getModule, MODULE_FUNCTIONS, MODULE_TABLES } from '@/lib/module-registry';
 
 /**
  * Module screen — shows the blueprint of one sealed module: its schema,
