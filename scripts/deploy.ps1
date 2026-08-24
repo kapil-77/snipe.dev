@@ -22,7 +22,9 @@ Set-Location (Split-Path -Parent $PSScriptRoot)
 $Functions = @(
     'onboardtime-hello', 'onboardtime-bootstrap',
     'onboardtime-runbooks', 'onboardtime-items',
-    'prunblocker-hello', 'envsync-hello'
+    'prunblocker-hello', 'prunblocker-bootstrap',
+    'prunblocker-gates', 'prunblocker-evaluate',
+    'prunblocker-webhook', 'envsync-hello'
   )
 
 function Invoke-Supabase {

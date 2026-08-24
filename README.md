@@ -51,7 +51,7 @@ That makes new tools additive instead of invasive.
 | Module | Status | What it does |
 |---|:---:|---|
 | **Onboardtime** | 🟢 Live | Role-based onboarding checklists, owners, milestones & progress |
-| **PR Unblocker** | ⚪ Soon | Merge gates, review requirements, blocking checks & conflict locks |
+| **PR Unblocker** | 🟢 Live | Declared merge gates — blocking checks, review requirements & conflict locks, with an enforcement audit trail |
 | **Envsync** | ⚪ Soon | Environment variables, rotation & encrypted delivery |
 
 ### Architecture at a glance

@@ -1,12 +1,13 @@
 import type { RouteObject } from 'react-router-dom';
 
-import { PrunblockerDetail } from './components/PrunblockerDetail';
+import { GateDetail } from './components/GateDetail';
+import { PrunblockerHome } from './components/PrunblockerHome';
 
 /**
- * Routes owned by the PR Unblocker module.
- * Coming-soon: registers a dedicated detail page (interactive preview +
- * architecture + waitlist). The app router ranks it above the :slug blueprint.
+ * Routes owned by the PR Unblocker module (live).
+ * Registered by the app router under the authenticated workspace layout.
  */
 export const prunblockerRoutes: RouteObject[] = [
-  { path: 'modules/prunblocker', element: <PrunblockerDetail /> },
+  { path: 'modules/prunblocker', element: <PrunblockerHome /> },
+  { path: 'modules/prunblocker/:gateId', element: <GateDetail /> },
 ];

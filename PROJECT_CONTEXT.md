@@ -1,4 +1,4 @@
-# PROJECT_CONTEXT ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â snipe.dev
+﻿# PROJECT_CONTEXT ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â snipe.dev
 
 Multi-module dev-tools SaaS shell. **One module = one Postgres schema = one set of
 edge functions = isolated by default.** Handoff document for the next coding agent.
@@ -7,9 +7,12 @@ edge functions = isolated by default.** Handoff document for the next coding age
 
 - **Shell + landing + auth are fully functional and live.**
 - **Onboardtime is the first built module** (runbooks + checklist items).
-- **prunblocker / envsync are still "coming soon"** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â scaffolded (schema, RLS, hello edge fn) but no real UI.
+- **envsync is still "coming soon"** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â scaffolded (schema, RLS, hello edge fn) but no real UI.
 - Auth (email + GitHub OAuth) works against a real hosted Supabase project.
 - Waitlist form **stores** emails only ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â **does not send email** (see Known Issues).
+- **PR Unblocker is the second live module** — merge-gate CRUD, an in-app evaluation
+  runner, and a persisted enforcement audit trail (module_prunblocker). Availability is
+  in-shell; real-GitHub webhook enforcement is a reserved seam (not yet connected).
 
 **Stack:** Vite 8 ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· React 19 ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· TypeScript 5.9 (.tsx, bundler/noEmit) ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Tailwind CSS 4
 ( @tailwindcss/vite ) ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· react-router dom 7 (new Route element API) ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· lucide-react ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â·
@@ -48,15 +51,16 @@ src/
                     Marquee, Logo, SectionHeading, GithubMark (Reveal re-exports)
   hooks/    use-in-view.tsx  (scroll reveal)
   lib/      supabase, cn, constants, module-registry, api(probe), database.types, waitlist
-  modules/  onboardtime (LIVE) / prunblocker / envsync (coming soon) / _template
+  modules/  onboardtime (LIVE) / prunblocker (LIVE) / envsync (coming soon) / _template
   pages/    Landing + landing/*, auth/* (LoginPage, AuthCallback, NotFound)
   styles/   globals.css (design tokens)
   main.tsx, vite-env.d.ts
 
 supabase/
   functions/  onboardtime-{hello,bootstrap,runbooks,items},
-              prunblocker-hello, envsync-hello, _shared/cors.ts
-  migrations/ 00000..00006
+              prunblocker-{hello,bootstrap,gates,evaluate,webhook},
+              envsync-hello, _shared/cors.ts
+  migrations/ 00000..00007
 
 scripts/    deploy.sh / deploy.ps1
 ```
@@ -91,11 +95,11 @@ scripts/    deploy.sh / deploy.ps1
 
 ### One-off / now
 - If not done: run ./scripts/deploy.sh once to push migrations + deploy edge functions.
-- Set SUPABASE SERVICE_ROLE_KEY as a **function secret** on onboardtime-bootstrap .
-- Expect 6 edge functions ACTIVE in deploy.sh --verify output
+- Set SUPABASE SERVICE_ROLE_KEY as a **function secret** on onboardtime-bootstrap AND prunblocker-bootstrap.
+- expect 10 edge functions ACTIVE in deploy.sh --verify output
 
 ### Future modules (build like Onboardtime)
-- prunblocker - module_prunblocker + prunblocker-hello + gate CRUD UI. (Since 2026-08: has a dedicated coming-soon detail page with an interactive merge-gate preview, module-architecture section + vibe flow, and waitlist CTA - still coming-soon; the dedicated page is routed via src/modules/prunblocker/routes.tsx above the :slug blueprint.)
+- prunblocker - **NOW LIVE** (see "PR Unblocker (implemented)" below). Real GitHub webhook enforcement remains ON THE ROADMAP via the reserved `github_installations` table + `prunblocker-webhook` endpoint.
 - envsync ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â module_envsync + envsync-hello + env-var CRUD UI.
 
 ### How to build a new module
@@ -144,14 +148,72 @@ scripts/    deploy.sh / deploy.ps1
 
 ## Next steps for the next coding agent
 
-Run ./scripts/deploy.sh --verify (expect 6 ACTIVE functions: onboardtime-{hello,bootstrap,runbooks,items},
-prunblocker-hello, envsync-hello). Then build prunblocker or envsync in the same pattern as Onboardtime.
+Run ./scripts/deploy.sh --verify (expect 10 ACTIVE functions: onboardtime-{hello,bootstrap,runbooks,items},
+prunblocker-{hello,bootstrap,gates,evaluate,webhook}, envsync-hello). Both Onboardtime and PR Unblocker are
+live; build envsync in the same pattern next.
 **Keep the isolation convention sacred.**
 
 ---
 
-## Onboardtime Upgrade (implemented ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â 000006 + edge fns + module UI)
+## PR Unblocker (implemented — 000007 + edge fns + module UI)
 
+**STATUS: IMPLEMENTED.** `tsc -b` clean + `vite build` passes. Not yet deployed to hosted
+Supabase (see Verification). Scope: take PR Unblocker from coming-soon preview to a real
+**in-shell merge-gate workflow** with a persisted enforcement audit trail. No change to the
+module isolation conventions; `module_prunblocker.is_org_member` RLS is reused unchanged.
+
+### Schema (additive — migration 20260101000007_module_prunblocker_workflow.sql)
+- `pr_evaluations` — org-scoped audit trail written by every evaluate run
+  (repo/branches, required vs passed checks, review counts, conflicts, `verdict
+  ('ready'|'blocked')`, `blocked_reasons[]`, `created_by`, `created_at`).
+- `github_installations` — **reserved seam** for future real-GitHub enforcement
+  (github_app_id, installation_id, repo_name, account_login, enabled). No live GitHub calls
+  today; declared now so a future webhook can join without a schema rewrite.
+- Indexes on `merge_gates(org_id, repo)`, `pr_evaluations(org_id|gate_id)`,
+  `github_installations(org_id)`.
+
+### Edge functions (prefix `prunblocker-`)
+- `bootstrap`: idempotent personal-org provisioning (mirror of onboardtime-bootstrap;
+  needs `SERVICE_ROLE_KEY`).
+- `gates`: CRUD + enable/disable for `merge_gates`.
+- `evaluate`: enforcement engine. POST: resolves the first enabled gate whose repo matches
+  (case-insensitive) AND whose source/target branch regex both match; computes
+  ready/blocked + `blocked_reasons[]`; PERSISTS a `pr_evaluations` row; returns 404
+  `{applies:false,reason}` when out of scope. GET: audit-trail readback
+  (`?org_id&gate_id?`, newest first, limit 50).
+- `webhook`: JSON `501 not_configured` STUB documenting the GitHub delivery seam.
+- `hello`: now `status: "live"` listing the three tables.
+
+### Data layer (src/modules/prunblocker)
+- `types.ts`: `MergeGate`, `PrEvaluation`, `GateDraft`, `PrReport`, `EvaluationResult`,
+  `WorkspaceOrg`, `VERDICT_LABELS`, `GATE_POLICY_OPTIONS` (field-keyed).
+- `api.ts`: `bootstrapOrg`, `listGates/createGate/updateGate/deleteGate`, `evaluatePr`,
+  `listEvaluations`, `pingPrunblocker`.
+- `hooks/`: `useWorkspaceOrg` (module-local), `useGates`, `useEvaluate`
+  (returns the `EvaluationResult` for optimistic feed prepend), `useEvaluations`.
+- `database.types.ts`: `MergeGateRow` synced (`repo`, `created_by`), `PrEvaluationRow`,
+  `GithubInstallationRow`, and the schema's table registration.
+
+### UI
+- `routes.tsx`: `modules/prunblocker` -> `PrunblockerHome`; `modules/prunblocker/:gateId` -> `GateDetail`.
+- `PrunblockerHome`: declare gate form (repo, branch regexes, required checks, policy
+  toggles), gate grid (`GateCard`), evaluate runner (`EvaluatePanel`), and the org-wide
+  enforcement `Feed`.
+- `GateDetail`: policy toggles, required-checks editor, pause/resume + delete,
+  per-gate evaluate runner, per-gate feed.
+- The dedicated coming-soon preview (`PrunblockerDetail.tsx`) was removed — replaced by
+  the live module.
+
+### Verification
+- `tsc -b` clean; `vite build` succeeds (the single >500kB chunk warning is pre-existing).
+- **Not yet deployed to hosted Supabase.** To stage: `supabase db push` +
+  `supabase functions deploy prunblocker-bootstrap prunblocker-gates prunblocker-evaluate prunblocker-webhook`
+  (`skip` hello only), set SERVICE_ROLE_KEY on prunblocker-bootstrap, then `deploy.sh --verify`
+  (expect 10).
+
+---
+
+## Onboardtime Upgrade (implemented ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â·ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¬Ãƒâ€šÃ‚Â¢ 000006 + edge fns + module UI)
 **STATUS: IMPLEMENTED.** `tsc -b` clean + `vite build` passes. Not yet deployed to
 hosted Supabase (see Verification). Scope: polish Onboardtime into a real
 dev-onboarding workflow. **No change to core architecture or visual identity.** The
@@ -253,9 +315,9 @@ RunbookCard,RunbookTemplates,AnalyticsBar,SectionHeader,NextMilestone,ItemMeta}`
   - **Redirect URLs** include `https://snipedev.vercel.app/**` AND `http://localhost:5173/**` (local dev).
 - **Authentication â†’ Providers â†’ GitHub**:
   - Client ID + secret from the GitHub OAuth app; callback `https://savvsjckbgtccqvgmooo.supabase.co/auth/v1/callback`.
-- **Edge-function secrets**: set `SERVICE_ROLE_KEY` (JWT from Dashboard â†’ Settings â†’ API) on `onboardtime-bootstrap` â€” required for personal-org provisioning.
+- **Edge-function secrets**: set `SERVICE_ROLE_KEY` (JWT from Dashboard â†’ Settings â†’ API) on `onboardtime-bootstrap` AND `prunblocker-bootstrap` â€” required for personal-org provisioning.
 - Apply pending migrations + deploy edge functions once from the CLI:
-  `supabase db push && supabase functions deploy onboardtime-runbooks onboardtime-items` (then `deploy.sh --verify`, expect 6).
+  `supabase db push` + `supabase functions deploy` for each of the 9 functions in `scripts/deploy.sh` (then `deploy.sh --verify`, expect 10).
 
 ### Login/OAuth flow (post-fix)
 1. `/login` â†’ GitHub â†’ Supabase â†’ redirect to `https://snipedev.vercel.app/auth/callback#access_token=â€¦`

@@ -19,6 +19,10 @@ FUNCTIONS=(
   onboardtime-runbooks
   onboardtime-items
   prunblocker-hello
+  prunblocker-bootstrap
+  prunblocker-gates
+  prunblocker-evaluate
+  prunblocker-webhook
   envsync-hello
 )
 
