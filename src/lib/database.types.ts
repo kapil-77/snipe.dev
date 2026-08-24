@@ -109,12 +109,51 @@ export type ChecklistItemRow = {
 export type MergeGateRow = {
   id: string;
   org_id: string;
+  repo: string;
   source_branch: string;
   target_branch: string;
   required_checks: string[];
   require_review: boolean;
   block_on_conflicts: boolean;
   enabled: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Verdict = 'ready' | 'blocked';
+
+export type PrEvaluationRow = {
+  id: string;
+  org_id: string;
+  gate_id: string | null;
+  repo: string;
+  source_branch: string;
+  target_branch: string;
+  required_checks: string[];
+  passed_checks: string[];
+  required_reviews: number;
+  review_approvals: number;
+  has_conflicts: boolean;
+  verdict: Verdict;
+  blocked_reasons: string[];
+  created_by: string | null;
+  created_at: string;
+}
+
+/**
+ * Reserved seam for real-GitHub enforcement (see prunblocker-webhook).
+ * Declared now, used once GitHub App integration ships.
+ */
+export type GithubInstallationRow = {
+  id: string;
+  org_id: string;
+  github_app_id: string;
+  installation_id: string;
+  repo_name: string;
+  account_login: string | null;
+  enabled: boolean;
+  created_by: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -166,6 +205,8 @@ export interface Database {
   module_prunblocker: {
     Tables: {
       merge_gates: MakeTable<MergeGateRow>;
+      pr_evaluations: MakeTable<PrEvaluationRow>;
+      github_installations: MakeTable<GithubInstallationRow>;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

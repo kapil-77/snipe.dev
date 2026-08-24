@@ -9,12 +9,13 @@ Deno.serve(async (req: Request) => {
 
   return json(
     {
-      status: "coming_soon",
+      status: "live",
       service: "prunblocker",
       schema: "module_prunblocker",
-      tables: ["merge_gates"],
-      message: "Merge-gate schema + RLS scaffolded; enforcement ships on activation.",
+      tables: ["merge_gates", "pr_evaluations", "github_installations"],
+      message:
+        "Merge gates, enforcement audit trail and the GitHub seam are live — declare a gate and run an evaluation.",
     },
-    { status: 501 },
+    { status: 200 },
   );
 });

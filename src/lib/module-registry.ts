@@ -50,7 +50,7 @@ export const MODULES: ModuleDef[] = [
     tagline: 'Merge-ready gates for pull requests',
     description:
       'Declare merge policies — blocking checks, review requirements, conflict locks — enforced the moment a PR leaves draft.',
-    status: 'coming-soon',
+    status: 'live',
     schema: 'module_prunblocker',
     edgePrefix: 'prunblocker-',
     order: 1,
@@ -84,7 +84,7 @@ export function getLiveModules(): ModuleDef[] {
  */
 export const MODULE_TABLES: Record<string, string[]> = {
   onboardtime: ['checklists', 'checklist_items'],
-  prunblocker: ['merge_gates'],
+  prunblocker: ['merge_gates', 'pr_evaluations', 'github_installations'],
   envsync: ['environment_vars'],
 };
 
@@ -96,6 +96,12 @@ export const MODULE_FUNCTIONS: Record<string, string[]> = {
     'onboardtime-runbooks',
     'onboardtime-items',
   ],
-  prunblocker: ['prunblocker-hello'],
+  prunblocker: [
+    'prunblocker-hello',
+    'prunblocker-bootstrap',
+    'prunblocker-gates',
+    'prunblocker-evaluate',
+    'prunblocker-webhook',
+  ],
   envsync: ['envsync-hello'],
 };
