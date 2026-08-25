@@ -1,4 +1,4 @@
-﻿# PROJECT_CONTEXT ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â snipe.dev
+# PROJECT_CONTEXT — snipe.dev
 
 Multi-module dev-tools SaaS shell. **One module = one Postgres schema = one set of
 edge functions = isolated by default.** Handoff document for the next coding agent.
@@ -7,15 +7,15 @@ edge functions = isolated by default.** Handoff document for the next coding age
 
 - **Shell + landing + auth are fully functional and live.**
 - **Onboardtime is the first built module** (runbooks + checklist items).
-- **envsync is still "coming soon"** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â scaffolded (schema, RLS, hello edge fn) but no real UI.
+- **envsync is still "coming soon"** — scaffolded (schema, RLS, hello edge fn) but no real UI.
 - Auth (email + GitHub OAuth) works against a real hosted Supabase project.
-- Waitlist form **stores** emails only ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â **does not send email** (see Known Issues).
+- Waitlist form **stores** emails only — **does not send email** (see Known Issues).
 - **PR Unblocker is the second live module** — merge-gate CRUD, an in-app evaluation
   runner, and a persisted enforcement audit trail (module_prunblocker). Availability is
   in-shell; real-GitHub webhook enforcement is a reserved seam (not yet connected).
 
-**Stack:** Vite 8 ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· React 19 ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· TypeScript 5.9 (.tsx, bundler/noEmit) ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Tailwind CSS 4
-( @tailwindcss/vite ) ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· react-router dom 7 (new Route element API) ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· lucide-react ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â·
+**Stack:** Vite 8 · React 19 · TypeScript 5.9 (.tsx, bundler/noEmit) · Tailwind CSS 4
+( @tailwindcss/vite ) · react-router dom 7 (new Route element API) · lucide-react ·
 @supabase/supabase-js 2.112.3 (Deno edge fns via esm.sh).
 
 **Design system:** extracted from ossium.in. Base #0E0F10, abyss #000, ink #E5E5E5,
@@ -30,13 +30,13 @@ Scroll reveal = IntersectionObserver, 200ms ease-out, via src/hooks/use-in-view.
 
 - Every module owns an isolated Postgres schema: module_onboardtime,
   module_prunblocker, module_envsync. No cross-module FKs. Only cross-schema edges
-   are to public.users(id) and public.orgs(id).
+  are to `public.users(id)` and `public.orgs(id)`.
 - `public` schema holds ONLY shared tables: users, orgs, org_members, waitlist.
 - **RLS enabled from day one** on every module table; policies scoped via
-   module_onboardtime.is_org_member(org_id) ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ checks public.org_members.
-- Edge-function name prefix **must match** its module schema (onboardtime-* ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â module_onboardtime).
-- A module\'s /src/modules/NAME imports ONLY from @/components/ui and @/lib. Never a module\'s folder.
-- Frontend never queries tables directly ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â all module data flows through its OWN edge functions (RLS enforcement).
+  `module_onboardtime.is_org_member(org_id)` — a security definer that checks `public.org_members`.
+- Edge-function name prefix **must match** its module schema (`onboardtime-*` → `module_onboardtime`).
+- A module's `/src/modules/NAME` imports ONLY from `@/components/ui` and `@/lib`. Never a module's folder.
+- Frontend never queries tables directly — all module data flows through its OWN edge functions (RLS enforcement).
 
 ---
 
@@ -76,18 +76,17 @@ scripts/    deploy.sh / deploy.ps1
 | src/app/auth.tsx | AuthProvider. Must subscribe to onAuthStateChange BEFORE getSession() (else OAuth races). |
 | src/shell/PublicLayout.tsx | Scroll-anchor: only runs on well-formed #section hashes; OAuth fragment crash fixed. |
 | src/lib/waitlist.ts | Waitlist insert. Supabase if configured else localStorage. Does NOT send email. |
-| supabase/functions/onboardtime-bootstrap/index.ts | Provisions org. Uses SERVICE ROLE (see Known Issues). |
+| supabase/functions/onboardtime-bootstrap/index.ts | Provisions org. Uses SERVICE_ROLE (see Known Issues). |
 | supabase/migrations/00005_shared_grants.sql | Retroactive API-role table grants (idempotent). |
-
 ---
 
 ## Decisions & their WHY
 
-1. Bootstrap uses SERVICE_ROLE table inserts, not an RPC ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â the RPC path hit a stuck PostgREST function cache.
-2. functions.invoke({ query }) is silently DROPPED by supabase-js ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â query is built INTO the function name.
+1. Bootstrap uses SERVICE_ROLE table inserts, not an RPC — the RPC path hit a stuck PostgREST function cache.
+2. functions.invoke({ query }) is silently DROPPED by supabase-js — query is built INTO the function name.
 3. Every "permission denied for table" was a missing API-role GRANT; migration 00005 + default privileges fix it.
-4. PublicLayout must NOT querySelector an OAuth hash (invalid selector ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ SyntaxError/blank); fixed with a guard.
-5. Figtree only; lucide removed brand icons ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ GithubMark is inline SVG.
+4. PublicLayout must NOT querySelector an OAuth hash (invalid selector → SyntaxError/blank); fixed with a guard.
+5. Figtree only; lucide removed brand icons — GithubMark is inline SVG.
 
 ---
 
@@ -100,7 +99,7 @@ scripts/    deploy.sh / deploy.ps1
 
 ### Future modules (build like Onboardtime)
 - prunblocker - **NOW LIVE** (see "PR Unblocker (implemented)" below). Real GitHub webhook enforcement remains ON THE ROADMAP via the reserved `github_installations` table + `prunblocker-webhook` endpoint.
-- envsync ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â module_envsync + envsync-hello + env-var CRUD UI.
+- envsync — module_envsync + envsync-hello + env-var CRUD UI.
 
 ### How to build a new module
 1. Copy src/modules/onboardtime (reference).
@@ -110,19 +109,19 @@ scripts/    deploy.sh / deploy.ps1
 5. npm run build & tsc -b.
 
 ### Do NOT
-- Don\'t run supabase init --force (regenerates config) unless re-merging custom settings.
-- Don\'t use bare functions.invoke({ query }) ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â append query to the fn name.
+- Don't run supabase init --force (regenerates config) unless re-merging custom settings.
+- Don't use bare functions.invoke({ query }) — append query to the fn name.
 
 ---
 
 ## Known Issues
 
-1. Waitlist does NOT send email ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â only inserts into public.waitlist (verified). No email provider.
+1. Waitlist does NOT send email — only inserts into public.waitlist (verified). No email provider.
    To send: add a waitlist-notify (alert admin) / confirm-waitlist (email user) edge fn + Resend API key + sender domain.
-2. Onboardtime bootstrap needs the SERVICE_ROLE_KEY secret ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â 500 without it.
-3. PostgREST function-catalog cache ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â prefer table inserts / service role over new RPCs; else NOTIFY pgrst + ALTER ROLE + reload.
-4. functions.invoke({ query }) dropped ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â build query into the fn name.
-5. Supabase CLI is the npm wrapper ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â "spawn UNKNOWN" in Git Bash if native binary missing.
+2. Onboardtime bootstrap needs the SERVICE_ROLE_KEY secret — 500 without it.
+3. PostgREST function-catalog cache — prefer table inserts / service role over new RPCs; else NOTIFY pgrst + ALTER ROLE + reload.
+4. functions.invoke({ query }) is silently DROPPED by supabase-js — build query into the fn name.
+5. Supabase CLI is the npm wrapper — "spawn UNKNOWN" in Git Bash if native binary missing.
 
 ---
 
@@ -140,7 +139,7 @@ scripts/    deploy.sh / deploy.ps1
 
 ## Auth Flow (already working)
 
-1. /login ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ email/GitHub ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Site URL http://localhost:5173 ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ session written to localStorage.
+1. /login → GitHub → Supabase → Site URL http://localhost:5173 → session written to localStorage.
 2. PublicLayout no longer crashes on the OAuth fragment (fixed).
 3. Protected /app/* requires a session via RequireAuth.
 
@@ -152,7 +151,6 @@ Run ./scripts/deploy.sh --verify (expect 10 ACTIVE functions: onboardtime-{hello
 prunblocker-{hello,bootstrap,gates,evaluate,webhook}, envsync-hello). Both Onboardtime and PR Unblocker are
 live; build envsync in the same pattern next.
 **Keep the isolation convention sacred.**
-
 ---
 
 ## PR Unblocker (implemented — 000007 + edge fns + module UI)
@@ -213,15 +211,15 @@ module isolation conventions; `module_prunblocker.is_org_member` RLS is reused u
 
 ---
 
-## Onboardtime Upgrade (implemented ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â·ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¬Ãƒâ€šÃ‚Â¢ 000006 + edge fns + module UI)
+## Onboardtime Upgrade (implemented — 000006 + edge fns + module UI)
+
 **STATUS: IMPLEMENTED.** `tsc -b` clean + `vite build` passes. Not yet deployed to
 hosted Supabase (see Verification). Scope: polish Onboardtime into a real
 dev-onboarding workflow. **No change to core architecture or visual identity.** The
 existing runbook/checklist functionality, `module_onboardtime.is_org_member` RLS, the
 edge-function-per-resource split, and the terminal dark theme (`#0e0f10` / `#09ae5b`
 accent) are all preserved. Role templates are **TS-only** (no DB seeding).
-
-### Schema (additive ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â migration 20260101000006_module_onboardtime_workflow.sql)
+### Schema (additive — migration 20260101000006_module_onboardtime_workflow.sql)
 Existing columns/rows untouched; new nullable/defaulted columns inherit the
 `00001` default-privilege grants:
 - `checklists`: `role` (template role), `owner_id` -> public.users,
@@ -238,7 +236,7 @@ Existing columns/rows untouched; new nullable/defaulted columns inherit the
   blockedTasks, commonBlockers[] }`; PATCH already exists.
 - `onboardtime-items`: accept the new `checklist_items` fields
   (section/category/priority/blocked/owner_id).
-- Query is built into the function name (supabase-js drops `query:` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â see Decisions #2).
+- Query is built into the function name (supabase-js drops `query:` — see Decisions #2).
 
 ### Data layer (src/modules/onboardtime)
 - `types.ts`: `RunbookAnalytics`, `RunbookStatus` + `getRunbookStatus()`, label maps
@@ -246,8 +244,9 @@ Existing columns/rows untouched; new nullable/defaulted columns inherit the
 - `templates.ts` (NEW, TS-only): `RoleSections = Record<ItemSection, TemplateSection>` shared
   `coreSections`, overridden per role; `sectionsForRole()` + `templateItemsForRole()`. No DB seed.
 - `api.ts`: `updateRunbook(id, patch)`, `getTeamAnalytics(orgId)`,
-  `createRunbookFromTemplate(orgId, role)` (create checklist + bulk-add items - the primary
+  `createRunbookFromTemplate(orgId, role)` (create checklist + bulk-add items — the primary
   TS-only path). `cloneTemplate(orgId, templateId)` kept as an edge power-feature.
+
 ### Hooks
 - Extend `useRunbookDetail` to also fetch analytics in its `Promise.all`.
 - Add `useTemplates()` (lists `is_template=true` role templates) and `useAnalytics()`.
@@ -262,40 +261,39 @@ Existing columns/rows untouched; new nullable/defaulted columns inherit the
 - New components: `RunbookTemplates`, `AnalyticsBar`, `SectionHeader`, `NextMilestone`, `ItemMeta`.
 - **States**: section-level empties (`ListChecks` dull icon), preserved loading spinners,
   item enter-fade via existing `Reveal` + stagger.
-- **Checkbox behavior**: the status box is a **direct complete-toggle** (`todo â†’ done`,
-  `done â†’ todo`; `doing` still exists in schema/types for future explicit "in progress"
+- **Checkbox behavior**: the status box is a **direct complete-toggle** (`todo → done`,
+  `done → todo`; `doing` still exists in schema/types for future explicit "in progress"
   but is no longer cycled through by the box).
 - **Mutation sync (no refresh flicker)**: item mutations (cycle / add / move / delete) are
-  **optimistic** â€” the edge fn's returned row is applied locally via
+  **optimistic** — the edge fn's returned row is applied locally via
   `applyItemLocally` / `swapLocal` / `removeItemLocally` in `useRunbookDetail`, so the
   list never full-reloads (no `Reveal` re-fade). `refresh()` is only used by the
   error-state Retry button. Analytics updates happen via a silent `refreshAnalyticsOnly()`
   (never touches the list).
-
 ### Non-goals (unchanged)
 - No RBAC beyond existing per-org RLS; no notifications/cron (analytics computed on request);
   no DnD libs (reuse `sort_order` swap); no new top-level routes/pages; no new
   colors/fonts; no changes to waitlist (stores-only) or auth.
 
 ### Files affected (all under the existing module or this doc)
-Migration `20260101000006_module_onboardtime_workflow.sql`;
-`supabase/functions/onboardtime-{runbooks,items}/index.ts`; `src/lib/database.types.ts`;
-`src/modules/onboardtime/{types,api,templates,hooks/useRunbookDetail,useTemplates,useAnalytics}`;
-`src/modules/onboardtime/components/{OnboardtimeHome,ChecklistDetail,ItemRow,
-RunbookCard,RunbookTemplates,AnalyticsBar,SectionHeader,NextMilestone,ItemMeta}`.
+- Migration `20260101000006_module_onboardtime_workflow.sql`;
+  `supabase/functions/onboardtime-{runbooks,items}/index.ts`; `src/lib/database.types.ts`;
+  `src/modules/onboardtime/{types,api,templates,hooks/useRunbookDetail,useTemplates,useAnalytics}`;
+  `src/modules/onboardtime/components/{OnboardtimeHome,ChecklistDetail,ItemRow,
+  RunbookCard,RunbookTemplates,AnalyticsBar,SectionHeader,NextMilestone,ItemMeta}`.
 
 ### Verification
 - `tsc -b` clean; `vite build` succeeds (the single >500kB chunk warning is pre-existing).
 - **Not yet deployed to hosted Supabase.** To stage: `supabase functions deploy
   onboardtime-runbooks onboardtime-items` + `supabase db push`; then `deploy.sh --verify`
-  (expect 6).
+  (expect 10).
 
 ---
 
 ## Production deploy checklist (Vercel + Supabase hosted)
 
 ### Vercel (live: https://snipedev.vercel.app)
-- Env vars (dashboard â†’ your project â†’ Settings â†’ Environment Variables):
+- Env vars (dashboard → your project → Settings → Environment Variables):
   | Var | Value |
   |---|---|
   | `VITE_SUPABASE_URL` | `https://savvsjckbgtccqvgmooo.supabase.co` |
@@ -306,25 +304,26 @@ RunbookCard,RunbookTemplates,AnalyticsBar,SectionHeader,NextMilestone,ItemMeta}`
   ```json
   { "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
   ```
-  Vercel serves real files (assets) before applying the rewrite â€” safe for a BrowserRouter SPA.
-- Without it, any non-home path gives a filesystem **404** (e.g. `/auth/callback#access_token=â€¦`).
+  Vercel serves real files (assets) before applying the rewrite — safe for a BrowserRouter SPA.
+- Without it, any non-home path gives a filesystem **404** (e.g. `/auth/callback#access_token=…`).
 
 ### Supabase hosted (via Dashboard)
-- **Authentication â†’ URL Configuration**:
+- **Authentication → URL Configuration**:
   - **Site URL** = `https://snipedev.vercel.app` (or a custom domain).
   - **Redirect URLs** include `https://snipedev.vercel.app/**` AND `http://localhost:5173/**` (local dev).
-- **Authentication â†’ Providers â†’ GitHub**:
+- **Authentication → Providers → GitHub**:
   - Client ID + secret from the GitHub OAuth app; callback `https://savvsjckbgtccqvgmooo.supabase.co/auth/v1/callback`.
-- **Edge-function secrets**: set `SERVICE_ROLE_KEY` (JWT from Dashboard â†’ Settings â†’ API) on `onboardtime-bootstrap` AND `prunblocker-bootstrap` â€” required for personal-org provisioning.
+- **Edge-function secrets**: set `SERVICE_ROLE_KEY` (JWT from Dashboard → Settings → API) on `onboardtime-bootstrap` AND `prunblocker-bootstrap` — required for personal-org provisioning.
 - Apply pending migrations + deploy edge functions once from the CLI:
-  `supabase db push` + `supabase functions deploy` for each of the 9 functions in `scripts/deploy.sh` (then `deploy.sh --verify`, expect 10).
+  `supabase db push` + `supabase functions deploy` for each of the 10 functions in
+  `scripts/deploy.sh` (then `deploy.sh --verify`, expect 10).
 
 ### Login/OAuth flow (post-fix)
-1. `/login` â†’ GitHub â†’ Supabase â†’ redirect to `https://snipedev.vercel.app/auth/callback#access_token=â€¦`
-2. `vercel.json` rewrite serves `index.html` â†’ `AuthCallback` runs â†’
-   `detectSessionInUrl` exchanges the fragment â†’ forwards `/app/modules`.
+1. `/login` → GitHub → Supabase → redirect to `https://snipedev.vercel.app/auth/callback#access_token=…`
+2. `vercel.json` rewrite serves `index.html` → `AuthCallback` runs →
+   `detectSessionInUrl` exchanges the fragment → forwards `/app/modules`.
 
-### âš ï¸ Token hygiene
-`#access_token=â€¦&refresh_token=â€¦&provider_token=gho_/ghr_â€¦` are LIVE credentials shown in
-the URL bar. Revoke any leaked sessions via Supabase Dashboard (Authentication â†’ Users â†’
-Revoke sessions) and GitHub (Settings â†’ Applications â†’ Revoke the OAuth grant).
+### ⚠️ Token hygiene
+`#access_token=…&refresh_token=…&provider_token=gho_/ghr_…` are LIVE credentials shown in
+the URL bar. Revoke any leaked sessions via Supabase Dashboard (Authentication → Users →
+Revoke sessions) and GitHub (Settings → Applications → Revoke the OAuth grant).

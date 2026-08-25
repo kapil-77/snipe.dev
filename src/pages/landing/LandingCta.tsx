@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { useAuth } from '@/app/auth';
 import { buttonClasses } from '@/components/ui/Button';
 import { Frame } from '@/components/ui/Frame';
 import { Reveal } from '@/components/ui/Reveal';
@@ -10,6 +11,8 @@ import { MODULES } from '@/lib/module-registry';
  * Closing CTA band — blueprint-framed, before the footer.
  */
 export function LandingCta() {
+  const { session } = useAuth();
+  const signedIn = Boolean(session?.user);
   return (
     <section aria-labelledby="cta-heading" className="scroll-mt-20">
       <div className="mx-auto w-full max-w-[1280px] px-6 py-14 sm:py-16 md:px-8 md:py-24 lg:px-12">
@@ -35,9 +38,9 @@ export function LandingCta() {
                 <WaitlistForm moduleId={MODULES[0].slug} source="footer-cta" buttonLabel="Join waitlist" size="md" />
               </div>
 
-              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
-                <Link to="/login" className={buttonClasses('primary', 'md')}>
-                  Log in with GitHub
+              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                <Link to={signedIn ? '/app/modules' : '/login'} className={buttonClasses('primary', 'md')}>
+                  {signedIn ? 'Open workspace' : 'Log in with GitHub'}
                 </Link>
                 <Link to="/#modules" className={buttonClasses('ghost', 'md')}>
                   Browse the modules →
