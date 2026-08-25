@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { useAuth } from '@/app/auth';
 import { buttonClasses } from '@/components/ui/Button';
 import { Frame } from '@/components/ui/Frame';
 import { Reveal } from '@/components/ui/Reveal';
@@ -10,6 +11,8 @@ import { MODULES } from '@/lib/module-registry';
  * mock whose four "+" corners tie it to the blueprint aesthetic.
  */
 export function LandingHero() {
+  const { session } = useAuth();
+  const signedIn = Boolean(session?.user);
   return (
     <section className="relative overflow-hidden">
       <div
@@ -42,13 +45,21 @@ export function LandingHero() {
           </Reveal>
 
           <Reveal delay={270}>
-            <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
-              <Link to="/#modules" className={buttonClasses('primary', 'lg')}>
-                Browse modules
-              </Link>
-              <Link to="/login" className={buttonClasses('outline', 'lg')}>
-                Log in with GitHub
-              </Link>
+            <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              {signedIn ? (
+                <Link to="/app/modules" className={buttonClasses('primary', 'lg')}>
+                  Open workspace
+                </Link>
+              ) : (
+                <>
+                  <Link to="/#modules" className={buttonClasses('primary', 'lg')}>
+                    Browse modules
+                  </Link>
+                  <Link to="/login" className={buttonClasses('outline', 'lg')}>
+                    Log in with GitHub
+                  </Link>
+                </>
+              )}
             </div>
             <p className="mt-6 text-center text-xs text-faint">
               free tier · email or GitHub OAuth · no credit card
