@@ -1,4 +1,4 @@
-import { probeEdgeFunction, type ProbeResult } from '@/lib/api';
+import { invokeEdgeFn } from '@/lib/edge-fn';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 import type {
@@ -19,49 +19,12 @@ import type {
  * directly — RLS does the gating inside the edge functions.
  */
 
-/** Every function owned by this module (mirrors /supabase/functions). */
-export const PR_UNBLOCKER_FUNCTIONS = [
-  'prunblocker-hello',
-  'prunblocker-bootstrap',
-  'prunblocker-gates',
-  'prunblocker-evaluate',
-  'prunblocker-webhook',
-] as const;
-
-interface InvokeInit {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
-  body?: unknown;
-  query?: Record<string, string>;
-}
-
-async function invoke<T>(fn: string, init: InvokeInit = {}): Promise<T> {
-  if (!isSupabaseConfigured || !supabase) {
-    throw new Error(
-      'Supabase is not configured — add VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY to .env',
-    );
-  }
-  // The installed supabase-js ignores the `query` option in functions.invoke
-  // (it builds the URL from the function name only). Build the query string
-  // into the function name so org-scoped calls actually reach the function.
-  let target = fn;
-  if (init.query) target = `${fn}?${new URLSearchParams(init.query).toString()}`;
-
-  const { data, error } = await supabase.functions.invoke<T>(target, {
-    method: init.method ?? 'POST',
-    ...(init.body !== undefined ? { body: JSON.stringify(init.body) } : {}),
-  });
-  if (error) {
-    throw new Error(error.message ?? 'Edge function call failed');
-  }
-  return data as T;
-}
-
 /* ------------------------------------------------------------------ */
 /*  bootstrap                                                          */
 /* ------------------------------------------------------------------ */
 
 export async function bootstrapOrg(): Promise<WorkspaceOrg> {
-  const result = await invoke<{
+  const result = await invokeEdgeFn<{
     orgId: string;
     orgName: string;
     user: { id: string; email: string };
@@ -78,7 +41,7 @@ export async function bootstrapOrg(): Promise<WorkspaceOrg> {
 /* ------------------------------------------------------------------ */
 
 export async function listGates(orgId: string): Promise<MergeGate[]> {
-  return invoke<MergeGate[]>('prunblocker-gates', {
+  return invokeEdgeFn<MergeGate[]>('prunblocker-gates', {
     method: 'GET',
     query: { org_id: orgId },
   });
@@ -97,7 +60,7 @@ function serializeDraft(draft: GateDraft) {
 }
 
 export async function createGate(orgId: string, draft: GateDraft): Promise<MergeGate> {
-  return invoke<MergeGate>('prunblocker-gates', {
+  return invokeEdgeFn<MergeGate>('prunblocker-gates', {
     method: 'POST',
     body: { org_id: orgId, ...serializeDraft(draft) },
   });
@@ -113,9 +76,8 @@ export interface GatePatch {
   enabled?: boolean;
 }
 
-/** PATCH a gate — pass `enabled` to toggle enforcement without editing fields. */
 export async function updateGate(id: string, patch: GatePatch): Promise<MergeGate> {
-  return invoke<MergeGate>('prunblocker-gates', {
+  return invokeEdgeFn<MergeGate>('prunblocker-gates', {
     method: 'PATCH',
     body: {
       id,
@@ -131,7 +93,7 @@ export async function updateGate(id: string, patch: GatePatch): Promise<MergeGat
 }
 
 export async function deleteGate(id: string): Promise<void> {
-  await invoke<{ ok: boolean }>('prunblocker-gates', {
+  await invokeEdgeFn<{ ok: boolean }>('prunblocker-gates', {
     method: 'DELETE',
     query: { id },
   });
@@ -193,19 +155,8 @@ export async function listEvaluations(
 ): Promise<PrEvaluation[]> {
   const query: Record<string, string> = { org_id: orgId };
   if (gateId) query.gate_id = gateId;
-  return invoke<PrEvaluation[]>('prunblocker-evaluate', {
+  return invokeEdgeFn<PrEvaluation[]>('prunblocker-evaluate', {
     method: 'GET',
     query,
   });
 }
-
-/* ------------------------------------------------------------------ */
-/*  health probe                                                       */
-/* ------------------------------------------------------------------ */
-
-/** Warm-up / health probe against our own hello edge function. */
-export async function pingPrunblocker(): Promise<ProbeResult> {
-  return probeEdgeFunction('prunblocker-hello');
-}
-
-export type PrunblockerProbe = ProbeResult;

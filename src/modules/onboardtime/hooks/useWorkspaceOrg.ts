@@ -1,32 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import type { WorkspaceOrg } from '@/lib/workspace-org';
+import { useAsync } from '@/lib/use-async';
 
 import { bootstrapOrg } from '../api';
-import type { WorkspaceOrg } from '../types';
 
 /**
  * Bootstraps (idempotently) the caller's personal org via the
  * `onboardtime-bootstrap` edge function, then holds it for the module UI.
  */
 export function useWorkspaceOrg() {
-  const [org, setOrg] = useState<WorkspaceOrg | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    try {
-      setOrg(await bootstrapOrg());
-      setError(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
-
+  const { data: org, loading, error, refresh } = useAsync<WorkspaceOrg>({
+    fetcher: () => bootstrapOrg(),
+  });
   return { org, loading, error, refresh };
 }
