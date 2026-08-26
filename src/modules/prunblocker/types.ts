@@ -1,5 +1,4 @@
 import type {
-  GithubInstallationRow,
   MergeGateRow,
   PrEvaluationRow,
   Verdict,
@@ -16,9 +15,6 @@ export type MergeGate = MergeGateRow;
 
 /** A persisted enforcement audit record. */
 export type PrEvaluation = PrEvaluationRow;
-
-/** Reserved seam row for future GitHub App integration. */
-export type GithubInstallation = GithubInstallationRow;
 
 /** A merge policy: both toggles at once with a one-line description. */
 export interface GatePolicy {
@@ -57,17 +53,7 @@ export type EvaluationResult = {
   evaluation?: PrEvaluation;
 };
 
-export interface WorkspaceOrg {
-  orgId: string;
-  orgName: string;
-  userEmail?: string;
-}
-
-export type GateStatus = 'enabled' | 'disabled';
-
-export function getGateStatus(gate: Pick<MergeGate, 'enabled'>): GateStatus {
-  return gate.enabled ? 'enabled' : 'disabled';
-}
+export type { WorkspaceOrg } from '@/lib/workspace-org';
 
 /* ------------------------------------------------------------------ */
 /*  Domain label maps — keep UI strings out of the data layer          */

@@ -34,8 +34,6 @@ export type ChecklistItem = ChecklistItemRow;
 
 export type ItemStatus = ChecklistItem['status'];
 
-export const ITEM_STATUSES: ItemStatus[] = ['todo', 'doing', 'done'];
-
 export type ItemDraft = {
   title: string;
   section?: ItemSection;
@@ -96,8 +94,4 @@ export const PRIORITY_LABELS: Record<ItemPriority, string> = {
   high: 'high',
 };
 
-export interface WorkspaceOrg {
-  orgId: string;
-  orgName: string;
-  userEmail?: string;
-}
+export type { WorkspaceOrg } from '@/lib/workspace-org';

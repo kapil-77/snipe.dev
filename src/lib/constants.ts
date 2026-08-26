@@ -3,10 +3,6 @@
  */
 export const SITE_NAME = 'snipe.dev';
 
-export const SITE_TAGLINE = 'dev tools, one isolated module at a time';
-
-export const GITHUB_OAUTH_REPO = 'https://github.com/snipe-dev';
-
 /** Design-system constant (extracted from ossium.in). */
 export const DASHED = {
   /** Dashed stroke colour used for frames + dividers. */
@@ -17,11 +13,4 @@ export const DASHED = {
   off: 10,
   /** Stroke thickness in px. */
   thickness: 1,
-} as const;
-
-export const SECTION_IDS = {
-  modules: 'modules',
-  pricing: 'pricing',
-  testimonials: 'testimonials',
-  faq: 'faq',
 } as const;

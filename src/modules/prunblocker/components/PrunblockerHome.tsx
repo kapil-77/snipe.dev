@@ -12,6 +12,7 @@ import { useEvaluate } from '../hooks/useEvaluate';
 import { useEvaluations } from '../hooks/useEvaluations';
 import { useGates } from '../hooks/useGates';
 import { useWorkspaceOrg } from '../hooks/useWorkspaceOrg';
+import { parseChecks } from '../parseChecks';
 import { GATE_POLICY_OPTIONS } from '../types';
 import { EvaluatePanel } from './EvaluatePanel';
 import { EvaluationFeed } from './EvaluationFeed';
@@ -62,12 +63,6 @@ export function PrunblockerHome() {
       setSaving(false);
     }
   }
-function parseChecks(text: string): string[] {
-  return text
-    .split(/[\n,]+/)
-    .map((c) => c.trim())
-    .filter(Boolean);
-}
 
 if (orgLoading) {
     return (

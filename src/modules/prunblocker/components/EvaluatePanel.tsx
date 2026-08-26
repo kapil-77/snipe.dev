@@ -14,6 +14,7 @@ import { Frame } from '@/components/ui/Frame';
 import { Input } from '@/components/ui/Input';
 
 import type { EvaluationResult, MergeGate, PrReport } from '../types';
+import { parseChecks } from '../parseChecks';
 import { VERDICT_LABELS } from '../types';
 
 /*
@@ -30,13 +31,6 @@ interface EvaluatePanelProps {
   result: EvaluationResult | null;
   error: string | null;
   onSubmitRun: (report: PrReport) => void;
-}
-
-function parseChecks(text: string): string[] {
-  return text
-    .split(/[\n,]+/)
-    .map((c) => c.trim())
-    .filter(Boolean);
 }
 
 export function EvaluatePanel(props: EvaluatePanelProps) {
