@@ -50,8 +50,11 @@ src/
   components/ui/  Frame, Divider, Button, Input, Badge, Card, Accordion,
                     Marquee, Logo, SectionHeading, GithubMark (Reveal re-exports)
   hooks/    use-in-view.tsx  (scroll reveal)
-  lib/      supabase, cn, constants, module-registry, api(probe), database.types, waitlist
-  modules/  onboardtime (LIVE) / prunblocker (LIVE) / envsync (coming soon) / _template
+  lib/      supabase, cn, constants, module-registry, edge-fn (shared invoke),
+            use-async (shared load/loading/error/refresh), workspace-org, api(probe),
+            database.types, waitlist
+  modules/  onboardtime (LIVE) / prunblocker (LIVE) / envsync (coming soon; no
+            client runtime yet — schema + hello edge fn live; see its README) / _template
   pages/    Landing + landing/*, auth/* (LoginPage, AuthCallback, NotFound)
   styles/   globals.css (design tokens)
   main.tsx, vite-env.d.ts
@@ -186,7 +189,8 @@ module isolation conventions; `module_prunblocker.is_org_member` RLS is reused u
 - `types.ts`: `MergeGate`, `PrEvaluation`, `GateDraft`, `PrReport`, `EvaluationResult`,
   `WorkspaceOrg`, `VERDICT_LABELS`, `GATE_POLICY_OPTIONS` (field-keyed).
 - `api.ts`: `bootstrapOrg`, `listGates/createGate/updateGate/deleteGate`, `evaluatePr`,
-  `listEvaluations`, `pingPrunblocker`.
+  `listEvaluations`. (Edge transport is shared via `@/lib/edge-fn`; optimistic
+  `applyGateLocally` / `removeGateLocally` / `prependLocally` on the hooks.)
 - `hooks/`: `useWorkspaceOrg` (module-local), `useGates`, `useEvaluate`
   (returns the `EvaluationResult` for optimistic feed prepend), `useEvaluations`.
 - `database.types.ts`: `MergeGateRow` synced (`repo`, `created_by`), `PrEvaluationRow`,
@@ -245,15 +249,17 @@ Existing columns/rows untouched; new nullable/defaulted columns inherit the
   `coreSections`, overridden per role; `sectionsForRole()` + `templateItemsForRole()`. No DB seed.
 - `api.ts`: `updateRunbook(id, patch)`, `getTeamAnalytics(orgId)`,
   `createRunbookFromTemplate(orgId, role)` (create checklist + bulk-add items — the primary
-  TS-only path). `cloneTemplate(orgId, templateId)` kept as an edge power-feature.
+  TS-only path). Server-side `template_id` cloning still exists in the runbooks edge fn.
 
 ### Hooks
-- Extend `useRunbookDetail` to also fetch analytics in its `Promise.all`.
-- Add `useTemplates()` (lists `is_template=true` role templates) and `useAnalytics()`.
+- `useRunbookDetail` also fetch analytics in its `Promise.all`.
+- Add `useTemplates()` (role templates), `useRunbooks()` etc. — all backed by the shared
+  `@/lib/use-async`. (A standalone `useAnalytics` was removed: the detail page loads
+  analytics through `useRunbookDetail`.)
 
 ### UI
 - **Home**: template picker (role cards, dashed Frame + accent hover) beside the existing
-  create form; cloning calls `cloneTemplate`. `RunbookCard` keeps the progress bar, adds
+  create form; selecting a role calls `createRunbookFromTemplate`. `RunbookCard` keeps the progress bar, adds
   owner initials + priority dot.
 - **Detail**: analytics header bar (4 stats) above the existing progress; items grouped by
   section with collapsible headers (chevron, 200ms); "Next milestone" `Frame` callout when
@@ -278,7 +284,7 @@ Existing columns/rows untouched; new nullable/defaulted columns inherit the
 ### Files affected (all under the existing module or this doc)
 - Migration `20260101000006_module_onboardtime_workflow.sql`;
   `supabase/functions/onboardtime-{runbooks,items}/index.ts`; `src/lib/database.types.ts`;
-  `src/modules/onboardtime/{types,api,templates,hooks/useRunbookDetail,useTemplates,useAnalytics}`;
+  `src/modules/onboardtime/{types,api,templates,hooks/useRunbookDetail,useTemplates,useRunbooks}`;
   `src/modules/onboardtime/components/{OnboardtimeHome,ChecklistDetail,ItemRow,
   RunbookCard,RunbookTemplates,AnalyticsBar,SectionHeader,NextMilestone,ItemMeta}`.
 
