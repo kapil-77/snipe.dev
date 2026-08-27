@@ -5,8 +5,6 @@ import { useAuth } from '@/app/auth';
 
 /**
  * Guards /app/* — every module shares this one gate.
- * Demo mode (no Supabase env) intentionally bounces to /login, which
- * explains the wiring that’s missing.
  */
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { session, loading } = useAuth();

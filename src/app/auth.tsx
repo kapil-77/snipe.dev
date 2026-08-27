@@ -11,7 +11,6 @@ import {
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 export interface AuthState {
-  /** null while loading or when signed out / unconfigured. */
   session: Session | null;
   loading: boolean;
   configured: boolean;
