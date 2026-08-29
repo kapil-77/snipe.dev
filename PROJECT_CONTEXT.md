@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT — snipe.dev
 
 Multi-module dev-tools SaaS shell. **One module = one Postgres schema = one set of
-edge functions = isolated by default.** Handoff document for the next coding agent.
+edge functions = isolated by default.** Internal engineering notes.
 
 ## Current State (high level)
 
@@ -148,7 +148,7 @@ scripts/    deploy.sh / deploy.ps1
 
 ---
 
-## Next steps for the next coding agent
+## Next steps
 
 Run ./scripts/deploy.sh --verify (expect 10 ACTIVE functions: onboardtime-{hello,bootstrap,runbooks,items},
 prunblocker-{hello,bootstrap,gates,evaluate,webhook}, envsync-hello). Both Onboardtime and PR Unblocker are
