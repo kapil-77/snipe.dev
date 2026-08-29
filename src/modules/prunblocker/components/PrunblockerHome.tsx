@@ -1,28 +1,20 @@
-import { GitPullRequest, LoaderCircle, Plus, ShieldCheck } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+﻿import { GitPullRequest, LoaderCircle, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Frame } from '@/components/ui/Frame';
-import { Input } from '@/components/ui/Input';
 import { Reveal } from '@/components/ui/Reveal';
 
-import { createGate, deleteGate } from '../api';
+import { deleteGate } from '../api';
 import { useEvaluate } from '../hooks/useEvaluate';
 import { useEvaluations } from '../hooks/useEvaluations';
 import { useGates } from '../hooks/useGates';
 import { useWorkspaceOrg } from '../hooks/useWorkspaceOrg';
-import { parseChecks } from '../parseChecks';
-import { GATE_POLICY_OPTIONS } from '../types';
+import { CreateGateForm } from './CreateGateForm';
 import { EvaluatePanel } from './EvaluatePanel';
 import { EvaluationFeed } from './EvaluationFeed';
 import { GateCard } from './GateCard';
-
-/** Map DB field → camelCase GateDraft key used by the create form state. */
-const POLICY_TO_DRAFT = {
-  require_review: 'requireReview',
-  block_on_conflicts: 'blockOnConflicts',
-} as const;
 
 /** PR Unblocker home — declare gates, run an evaluation, follow the audit trail. */
 export function PrunblockerHome() {
@@ -33,38 +25,18 @@ export function PrunblockerHome() {
     useEvaluations(org?.orgId);
   const { result, busy, error: evalRunError, run } = useEvaluate(org?.orgId);
 
-  const [repo, setRepo] = useState('');
-  const [sourceBranch, setSourceBranch] = useState('.*');
-  const [targetBranch, setTargetBranch] = useState('(main|master)');
-  const [checksText, setChecksText] = useState('');
-  const [policy, setPolicy] = useState({ requireReview: true, blockOnConflicts: true });
-  const [saving, setSaving] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  async function submit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!org || !repo.trim()) return;
-    setSaving(true);
-    setFormError(null);
+  async function remove(id: string) {
     try {
-      const gate = await createGate(org.orgId, {
-        repo: repo.trim(),
-        sourceBranch,
-        targetBranch,
-        requiredChecks: parseChecks(checksText),
-        ...policy,
-      });
-      applyGateLocally(gate);
-      setRepo('');
-      setChecksText('');
+      await deleteGate(id);
+      removeGateLocally(id);
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setSaving(false);
+      setDeleteError(err instanceof Error ? err.message : String(err));
     }
   }
 
-if (orgLoading) {
+  if (orgLoading) {
     return (
       <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-center">
         <LoaderCircle className="size-7 animate-spin text-muted" aria-hidden="true" />
@@ -86,15 +58,6 @@ if (orgLoading) {
         </div>
       </Frame>
     );
-  }
-
-  async function remove(id: string) {
-    try {
-      await deleteGate(id);
-      removeGateLocally(id);
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : String(err));
-    }
   }
 
   return (
@@ -120,82 +83,12 @@ if (orgLoading) {
           </div>
         </header>
       </Reveal>
-<Reveal delay={80} className="mt-8">
-        <Frame className="w-full">
-          <div className="p-5 sm:p-6">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-faint">
-              <ShieldCheck className="size-3.5 text-accent" aria-hidden="true" />
-              Declare a merge gate
-            </div>
-            <form onSubmit={submit} className="mt-4 flex flex-col gap-3">
-              <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto]">
-                <Input
-                  label="Repo"
-                  placeholder="owner/repo"
-                  value={repo}
-                  onChange={(e) => setRepo(e.target.value)}
-                  required
-                />
-                <Input
-                  label="Source branch (regex)"
-                  placeholder=".*"
-                  value={sourceBranch}
-                  onChange={(e) => setSourceBranch(e.target.value)}
-                />
-                <Input
-                  label="Target branch (regex)"
-                  placeholder="(main|master)"
-                  value={targetBranch}
-                  onChange={(e) => setTargetBranch(e.target.value)}
-                />
-                <Input
-                  label="Required checks"
-                  placeholder="lint, build"
-                  value={checksText}
-                  onChange={(e) => setChecksText(e.target.value)}
-                />
-              </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                {GATE_POLICY_OPTIONS.map((option) => (
-                  <label
-                    key={option.field}
-                    className="flex h-10 shrink-0 cursor-pointer select-none items-center gap-2 border px-3 text-xs transition-colors duration-200 ease-out"
-                    title={option.description}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={policy[POLICY_TO_DRAFT[option.field]]}
-                      onChange={(e) =>
-                        setPolicy((p) => ({ ...p, [POLICY_TO_DRAFT[option.field]]: e.target.checked }))
-                      }
-                      className="size-3.5 accent-[--color-accent]"
-                    />
-                    <span className={policy[POLICY_TO_DRAFT[option.field]] ? 'text-ink' : 'text-faint'}>
-                      {option.title}
-                    </span>
-                  </label>
-                ))}
-
-                <Button type="submit" variant="primary" size="sm" disabled={saving}>
-                  {saving ? (
-                    <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-                  ) : (
-                    <Plus className="size-4" aria-hidden="true" />
-                  )}
-                  Add gate
-                </Button>
-              </div>
-            </form>
-            {formError && (
-              <p role="alert" className="mt-2 text-xs leading-relaxed text-warning">
-                {formError}
-              </p>
-            )}
-          </div>
-        </Frame>
+      <Reveal delay={80} className="mt-8">
+        <CreateGateForm orgId={org.orgId} onCreated={applyGateLocally} />
       </Reveal>
-<Reveal delay={160} className="mt-8">
+
+      <Reveal delay={160} className="mt-8">
         <div className="flex flex-col gap-4">
           {error ? (
             <Frame className="w-full">
@@ -225,6 +118,11 @@ if (orgLoading) {
                 </Reveal>
               ))}
             </div>
+          )}
+          {deleteError && (
+            <p role="alert" className="mt-3 text-xs leading-relaxed text-warning">
+              {deleteError}
+            </p>
           )}
         </div>
       </Reveal>
