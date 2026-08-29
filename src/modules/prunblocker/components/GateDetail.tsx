@@ -30,7 +30,7 @@ export function GateDetail() {
   const { gateId } = useParams<{ gateId: string }>();
   const navigate = useNavigate();
   const { org, loading: orgLoading, error: orgError, refresh: refreshOrg } = useWorkspaceOrg();
-  const { gates, loading, error, refresh } = useGates(org?.orgId);
+  const { gates, loading, error, refresh, applyGateLocally } = useGates(org?.orgId);
   const { evaluations, loading: evalLoading, error: evalError, refresh: refreshEval, prependLocally } =
     useEvaluations(org?.orgId, gateId);
   const { result, busy, error: evalRunError, run } = useEvaluate(org?.orgId);
@@ -42,8 +42,8 @@ export function GateDetail() {
     if (!gateId) return;
     setMutationError(null);
     try {
-      await updateGate(gateId, patch);
-      await refresh();
+      const updated = await updateGate(gateId, patch);
+      if (updated) applyGateLocally(updated);
     } catch (err) {
       setMutationError(err instanceof Error ? err.message : String(err));
     }
