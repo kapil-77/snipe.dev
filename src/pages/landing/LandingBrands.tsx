@@ -4,7 +4,7 @@ import { Reveal } from '@/components/ui/Reveal';
 
 /*
  * "Brands using" strip — text wordmarks in a dashed frame + "+" corners,
- * drifting on a paused-on-hover marquee. PLACEHOLDER names: swap in the
+ * running on a continuous horizontal marquee loop. PLACEHOLDER names: swap in the
  * real set of teams that use snipe.dev before going public.
  */
 const BRANDS: Array<{ name: string; tag: string }> = [

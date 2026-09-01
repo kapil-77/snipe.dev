@@ -46,7 +46,7 @@
 
 @keyframes marquee {
   to {
-    transform: translateX(-50%);
+    transform: translateX(var(--marquee-shift, -25%));
   }
 }
 
@@ -139,5 +139,13 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Deliberate exception: keep the brands marquee looping continuously.
+     The strip is decorative; the site owner wants it moving even when
+     the OS requests reduced motion. */
+  .animate-marquee {
+    animation-duration: 26s !important;
+    animation-iteration-count: infinite !important;
   }
 }
