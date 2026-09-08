@@ -207,7 +207,9 @@ module isolation conventions; `module_prunblocker.is_org_member` RLS is reused u
   the live module.
 
 ### Verification
-- `tsc -b` clean; `vite build` succeeds (the single >500kB chunk warning is pre-existing).
+- `tsc -b` clean; `vite build` succeeds — the old single >500kB chunk warning is **fixed**
+  (module routes lazy-load via React 19 `lazy()`; `vite.config.ts` splits vendor buckets
+  + a 400kB `chunkSizeWarningLimit` guardrail). Largest chunk ~221kB.
 - **Not yet deployed to hosted Supabase.** To stage: `supabase db push` +
   `supabase functions deploy prunblocker-bootstrap prunblocker-gates prunblocker-evaluate prunblocker-webhook`
   (`skip` hello only), set SERVICE_ROLE_KEY on prunblocker-bootstrap, then `deploy.sh --verify`
@@ -289,7 +291,8 @@ Existing columns/rows untouched; new nullable/defaulted columns inherit the
   RunbookCard,RunbookTemplates,AnalyticsBar,SectionHeader,NextMilestone,ItemMeta}`.
 
 ### Verification
-- `tsc -b` clean; `vite build` succeeds (the single >500kB chunk warning is pre-existing).
+- `tsc -b` clean; `vite build` succeeds — chunk warning fixed (React 19 lazy() module
+  routes + vendor chunks; see `vite.config.ts`).
 - **Not yet deployed to hosted Supabase.** To stage: `supabase functions deploy
   onboardtime-runbooks onboardtime-items` + `supabase db push`; then `deploy.sh --verify`
   (expect 10).
